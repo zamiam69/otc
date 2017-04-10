@@ -1,0 +1,25 @@
+---
+url: "{{os_auth_url}}/auth/tokens"
+method: POST
+body_format: json
+follow_redirects: all
+status_code: 201
+return_content: yes 
+validate_certs: no
+HEADER_Content-Type: "application/json"
+body:
+  auth:
+    identity:
+      methods:
+      - password
+      password:
+        user:
+          name: "{{os_username}}"
+          password: "{{os_password}}"
+          domain:
+            name: "{{os_username.split(' ') | last}}"
+    scope:
+      project:
+        name: "{{os_project_name}}"
+
+# vim: sts=2 sw=2 ts=2 et:
