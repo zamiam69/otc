@@ -10,7 +10,8 @@
 ### Test shade compatibility
 
 This creates a cloud instance analogous to the `shade.openstack_cloud()` method.
-list\_servers() is a method provided by shade and 
+list\_servers() is a method provided by shade and this set of command demoes
+`shade` methods are also available through the `otc.OTCCloud` object.
 
 	$ python
 	Python 2.7.12 (default, Nov 19 2016, 06:48:10)
