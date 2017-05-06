@@ -3,6 +3,7 @@ import requests
 import warnings
 
 class OtcClient(object):
+    """Client for the OTC API"""
     _token_req = {
         'auth': {
             'identity': {
@@ -22,26 +23,32 @@ class OtcClient(object):
     }
 
     def __init__(self, cloud_config):
+        """Make os client config available and request an OTC API IAM Token"""
         self._cloud_config = cloud_config
         self._get_token()
 
     @property
     def cloud_config(self):
+        """OS client config"""
         return self._cloud_config
 
     @property
     def token(self):
+        """OTC API Token, might be the same as the keystone token"""
         return self._token
 
     @property
     def catalog(self):
+        """OTC catalog, apparently the same as keystone's"""
         return self._catalog
 
     @property
     def projectid(self):
+        """OTC project id, required for OTC API requests"""
         return self._projectid
 
     def vpcs(self, limit=1024):
+        """Look up all vpcs"""
         endpoints = [ep for e in self._catalog for ep in e['endpoints'] if e['type'] == "network"]
         if len(endpoints) == 0:
             raise otc.OtcException("No network endpoint in otc catalog.")
@@ -66,12 +73,14 @@ class OtcClient(object):
         raise otc.OtcException(resp.headers)
 
     def vpc_byname(self, vpc_name):
+        """Look up a vpc by name."""
         vpcs = [v for v in self.vpcs() if v['name'] == vpc_name]
         if len(vpcs) > 1:
             warnings.warn("vpc name '{}' is not unique!".format(vpc_name))
         return vpcs
 
     def elb(self, vpc="", limit=1024):
+        """Look up elbs for a given vpc name"""
         endpoints = [ep for e in self._catalog for ep in e['endpoints'] if e['type'] == "network"]
         if len(endpoints) == 0:
             raise otc.OtcException("No network endpoint in otc catalog.")
@@ -104,6 +113,7 @@ class OtcClient(object):
         raise otc.OtcException(resp.headers)
 
     def elb_byname(self, vpcname, elbname):
+        """Find elbs by name for a given vpc"""
         vpcs = self.vpc_byname(vpcname)
         elbs = [e for e in self.elb(vpcs[0]['name'])['loadbalancers'] if e['name'] == elbname]
         if len(elbs) > 1:
@@ -111,6 +121,7 @@ class OtcClient(object):
         return elbs
 
     def elb_listeners(self, elbid):
+        """Look up listeners for a given elb id"""
         endpoints = [ep for e in self._catalog for ep in e['endpoints'] if e['type'] == "network"]
         if len(endpoints) == 0:
             raise otc.OtcException("No network endpoint in otc catalog.")
@@ -137,6 +148,7 @@ class OtcClient(object):
         raise otc.OtcException(resp.headers)
 
     def elb_listeners_byelbname(self, vpcname, elbname):
+        """Look up listeners for a given vpc name and elb name"""
         elbs = self.elb_byname(vpcname, elbname)
         return self.elb_listeners(elbs[0]['id'])
 
