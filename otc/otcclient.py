@@ -1,5 +1,6 @@
 import json
 import requests
+import warnings
 
 class OtcClient(object):
     _token_req = {
@@ -63,6 +64,81 @@ class OtcClient(object):
 			return vpcs
 
         raise otc.OtcException(resp.headers)
+
+    def vpc_byname(self, vpc_name):
+        vpcs = [v for v in self.vpcs() if v['name'] == vpc_name]
+        if len(vpcs) > 1:
+            warnings.warn("vpc name '{}' is not unique!".format(vpc_name))
+        return vpcs
+
+    def elb(self, vpc="", limit=1024):
+        endpoints = [ep for e in self._catalog for ep in e['endpoints'] if e['type'] == "network"]
+        if len(endpoints) == 0:
+            raise otc.OtcException("No network endpoint in otc catalog.")
+        ep_elb = endpoints[0]['url'].replace('vpc', 'elb', 1)
+
+        vpcs = self.vpc_byname(vpc)
+        if len(vpcs) == 0:
+            vpcid = ""
+        else:
+            vpcid = vpcs[0]['id']
+
+        requri = "{}/v1.0/{}/elbaas/loadbalancers?vpc_id={}&limit={}".format(ep_elb, self._projectid, vpcid, limit)
+
+        reqheaders = {
+            "Content-Type":    "application/json",
+            "Accept":           "application/json",
+            "X-Language":       "en-us",
+            "X-Auth-Token":     self._token,
+        }
+
+        try:
+            resp = requests.get(requri, headers=reqheaders)
+            elbs = resp.json()
+        except Exception, e:
+			raise
+
+        if resp.status_code == 200:
+			return elbs
+
+        raise otc.OtcException(resp.headers)
+
+    def elb_byname(self, vpcname, elbname):
+        vpcs = self.vpc_byname(vpcname)
+        elbs = [e for e in self.elb(vpcs[0]['name'])['loadbalancers'] if e['name'] == elbname]
+        if len(elbs) > 1:
+            warnings.warn("elb name '{}' is not unique!".format(elbname))
+        return elbs
+
+    def elb_listeners(self, elbid):
+        endpoints = [ep for e in self._catalog for ep in e['endpoints'] if e['type'] == "network"]
+        if len(endpoints) == 0:
+            raise otc.OtcException("No network endpoint in otc catalog.")
+        ep_elb = endpoints[0]['url'].replace('vpc', 'elb', 1)
+
+        requri = "{}/v1.0/{}/elbaas/listeners?loadbalancer_id={}".format(ep_elb, self._projectid, elbid)
+
+        reqheaders = {
+            "Content-Type":    "application/json",
+            "Accept":           "application/json",
+            "X-Language":       "en-us",
+            "X-Auth-Token":     self._token,
+        }
+
+        try:
+            resp = requests.get(requri, headers=reqheaders)
+            elbs = resp.json()
+        except Exception, e:
+			raise
+
+        if resp.status_code == 200:
+			return elbs
+
+        raise otc.OtcException(resp.headers)
+
+    def elb_listeners_byelbname(self, vpcname, elbname):
+        elbs = self.elb_byname(vpcname, elbname)
+        return self.elb_listeners(elbs[0]['id'])
 
     def _get_token(self):
         try:
