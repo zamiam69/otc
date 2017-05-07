@@ -27,10 +27,14 @@ class OtcClient(object):
         }
     }
 
-    def __init__(self, cloud_config):
+    def __init__(self, cloud_config, catalog=None, keystone_session=None):
         """Make os client config available and request an OTC API IAM Token"""
         self._cloud_config = cloud_config
-        self._get_token()
+        if catalog is None or keystone_session is None:
+            self._get_token()
+        else:
+            self._catalog = catalog
+            self._keystone_session = keystone_session
 
     @property
     def cloud_config(self):
@@ -40,7 +44,8 @@ class OtcClient(object):
     @property
     def token(self):
         """OTC API Token, might be the same as the keystone token"""
-        return self._token
+        # return self._token
+        return self._keystone_session.get_token()
 
     @property
     def catalog(self):
@@ -51,11 +56,12 @@ class OtcClient(object):
     def projectid(self):
         """OTC project id, required for OTC API requests. Also referred to as
            tenant_id in Huaweis documentation"""
-        return self._projectid
+        # return self._projectid
+        return self._keystone_session.get_project_id()
 
     @property
     def elbaas_enpoint(self):
-        endpoints = [ep for e in self._catalog 
+        endpoints = [ep for e in self.catalog 
                         for ep in e['endpoints'] 
                         if e['type'] == "network"]
         if len(endpoints) == 0:
@@ -64,16 +70,16 @@ class OtcClient(object):
 
     def vpcs(self, limit=1024):
         """Look up all vpcs"""
-        endpoints = [ep for e in self._catalog for ep in e['endpoints'] if e['type'] == "network"]
+        endpoints = [ep for e in self.catalog for ep in e['endpoints'] if e['type'] == "network"]
         if len(endpoints) == 0:
             raise otc.OtcException("No network endpoint in otc catalog.")
 
-        requri = "{}/v1/{}/vpcs?limit={}".format(endpoints[0]['url'], self._projectid, limit)
+        requri = "{}/v1/{}/vpcs?limit={}".format(endpoints[0]['url'], self.projectid, limit)
         reqheaders = {
             "Content-Type":    "application/json",
             "Accept":           "application/json",
             "X-Language":       "en-us",
-            "X-Auth-Token":     self._token,
+            "X-Auth-Token":     self.token,
         }
 
         try:
@@ -101,7 +107,7 @@ class OtcClient(object):
         """Look up elbs"""
         requri = "{}/v1.0/{}/elbaas/loadbalancers?limit={}".format(
             self.elbaas_enpoint,
-            self._projectid,
+            self.projectid,
             limit)
         
         if vpc is not None:
@@ -116,7 +122,7 @@ class OtcClient(object):
             "Content-Type":    "application/json",
             "Accept":           "application/json",
             "X-Language":       "en-us",
-            "X-Auth-Token":     self._token,
+            "X-Auth-Token":     self.token,
         }
 
         try:
@@ -143,7 +149,7 @@ class OtcClient(object):
         """Look up listeners"""
         requri = "{}/v1.0/{}/elbaas/listeners".format(
             self.elbaas_enpoint, 
-            self._projectid
+            self.projectid
         )
         if elb is not None:
             elbid = self.elb(elb)[0]['id']
@@ -153,7 +159,7 @@ class OtcClient(object):
             "Content-Type":    "application/json",
             "Accept":           "application/json",
             "X-Language":       "en-us",
-            "X-Auth-Token":     self._token,
+            "X-Auth-Token":     self.token,
         }
 
         try:

@@ -12,6 +12,9 @@ OTC proprietary stuff will be dealt with in this module."""
 
     def __init__(self, *args, **kwargs):
         super(OtcCloud, self).__init__(*args, **kwargs)
-        self.otcclient = otcclient.OtcClient(self.cloud_config)
+        self.otcclient = otcclient.OtcClient(
+            self.cloud_config, 
+            catalog=self.service_catalog,
+            keystone_session=self.keystone_session)
 
 # vim: sts=4 sw=4 ts=4 et:
