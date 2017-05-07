@@ -1,0 +1,18 @@
+Source: python-otc
+Section: python
+Priority: optional
+Maintainer: Matthias Witte <matthias.witte@g.zamiam.de>
+Build-Depends: debhelper (>= 7)
+Standards-Version: 3.9.7
+Homepage: https://git.internal.app.telekomcloud.com/puppet-profiles/rnpotc
+Vcs-Git: https://git.internal.app.telekomcloud.com/puppet-profiles/rnpotc.git
+Vcs-Browser: https://git.internal.app.telekomcloud.com/puppet-profiles/rnpotc/tree/master
+
+Package: puppet-csi-profiles
+Priority: optional
+Section: python
+Architecture: all
+Depends: puppet-shade, ${misc:Depends}
+Description: OTC python client library
+ This package provides a python client library based
+ on python-shade for Open Telekom Cloud (OTC) projects.

@@ -2,3 +2,5 @@
 *~
 *.sw[ap]
 clouds.yaml
+build
+otc.egg-info
