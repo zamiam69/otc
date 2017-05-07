@@ -4,11 +4,10 @@ Priority: optional
 Maintainer: Matthias Witte <matthias.witte@g.zamiam.de>
 Build-Depends: debhelper (>= 7)
 Standards-Version: 3.9.7
-Homepage: https://git.internal.app.telekomcloud.com/puppet-profiles/rnpotc
-Vcs-Git: https://git.internal.app.telekomcloud.com/puppet-profiles/rnpotc.git
-Vcs-Browser: https://git.internal.app.telekomcloud.com/puppet-profiles/rnpotc/tree/master
+Homepage: https://github.com/zamiam69/otc
+Vcs-Git: https://github.com/zamiam69/otc.git
 
-Package: puppet-csi-profiles
+Package: python-otc
 Priority: optional
 Section: python
 Architecture: all
