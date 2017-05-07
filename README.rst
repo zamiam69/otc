@@ -15,7 +15,6 @@ This library intends to make theses APIs accessible on top of shade.
 How to use it
 -------------
 
-::
     import otc
 
     cloud = otc.OtcCloud()
