@@ -36,7 +36,7 @@ setup(
     author_email='matthias.witte@g.zamiam.de',
 
     # Choose your license
-    license='MIT',
+    license='Apache',
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
@@ -48,10 +48,11 @@ setup(
 
         # Indicate who your project is intended for
         'Intended Audience :: Developers',
+        'Intended Audience :: System Administrators',
         'Topic :: Software Development :: Build Tools',
 
         # Pick your license as you wish (should match "license" above)
-        'License :: OSI Approved :: MIT License',
+        'License :: OSI Approved :: Apache Software License',
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
@@ -61,6 +62,8 @@ setup(
         #'Programming Language :: Python :: 3.3',
         #'Programming Language :: Python :: 3.4',
         #'Programming Language :: Python :: 3.5',
+        
+        'Environment :: OpenStack',
     ],
 
     # What does your project relate to?
@@ -68,7 +71,7 @@ setup(
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
-    packages=find_packages(exclude=['contrib', 'docs', 'tests']),
+    packages=find_packages(exclude=['contrib', 'docs', 'tests', 'debian']),
 
     # Alternatively, if you want to distribute just a my_module.py, uncomment
     # this:

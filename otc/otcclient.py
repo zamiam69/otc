@@ -2,6 +2,11 @@ import json
 import requests
 import warnings
 
+import re
+
+re_UUID844412 = re.compile(r'^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$')
+re_UUID = re.compile(r'^[0-9a-f]{32}$')
+
 class OtcClient(object):
     """Client for the OTC API"""
     _token_req = {
@@ -44,8 +49,18 @@ class OtcClient(object):
 
     @property
     def projectid(self):
-        """OTC project id, required for OTC API requests"""
+        """OTC project id, required for OTC API requests. Also referred to as
+           tenant_id in Huaweis documentation"""
         return self._projectid
+
+    @property
+    def elbaas_enpoint(self):
+        endpoints = [ep for e in self._catalog 
+                        for ep in e['endpoints'] 
+                        if e['type'] == "network"]
+        if len(endpoints) == 0:
+            raise otc.OtcException("No network endpoint in otc catalog.")
+        return endpoints[0]['url'].replace('vpc', 'elb', 1)
 
     def vpcs(self, limit=1024):
         """Look up all vpcs"""
@@ -72,27 +87,30 @@ class OtcClient(object):
 
         raise otc.OtcException(resp.headers)
 
-    def vpc_byname(self, vpc_name):
-        """Look up a vpc by name."""
-        vpcs = [v for v in self.vpcs() if v['name'] == vpc_name]
+    def vpc(self, vpc):
+        """Get vpc by name or id"""
+        lookup = 'id' if re_UUID844412.match(vpc) else 'name'
+
+        vpcs = [v for v in self.vpcs() if v[lookup] == vpc]
         if len(vpcs) > 1:
-            warnings.warn("vpc name '{}' is not unique!".format(vpc_name))
+            warnings.warn("vpc '{}' is not unique!".format(vpc))
         return vpcs
 
-    def elb(self, vpc="", limit=1024):
-        """Look up elbs for a given vpc name"""
-        endpoints = [ep for e in self._catalog for ep in e['endpoints'] if e['type'] == "network"]
-        if len(endpoints) == 0:
-            raise otc.OtcException("No network endpoint in otc catalog.")
-        ep_elb = endpoints[0]['url'].replace('vpc', 'elb', 1)
 
-        vpcs = self.vpc_byname(vpc)
-        if len(vpcs) == 0:
-            vpcid = ""
-        else:
-            vpcid = vpcs[0]['id']
-
-        requri = "{}/v1.0/{}/elbaas/loadbalancers?vpc_id={}&limit={}".format(ep_elb, self._projectid, vpcid, limit)
+    def elbs(self, vpc=None, limit=1024):
+        """Look up elbs"""
+        requri = "{}/v1.0/{}/elbaas/loadbalancers?limit={}".format(
+            self.elbaas_enpoint,
+            self._projectid,
+            limit)
+        
+        if vpc is not None:
+            vpcs = self.vpc(vpc)
+            if len(vpcs) == 0:
+                vpcid = ""
+            else:
+                vpcid = vpcs[0]['id']
+            requri += "&vpc_id={}".format(vpcid)
 
         reqheaders = {
             "Content-Type":    "application/json",
@@ -112,22 +130,24 @@ class OtcClient(object):
 
         raise otc.OtcException(resp.headers)
 
-    def elb_byname(self, vpcname, elbname):
-        """Find elbs by name for a given vpc"""
-        vpcs = self.vpc_byname(vpcname)
-        elbs = [e for e in self.elb(vpcs[0]['name'])['loadbalancers'] if e['name'] == elbname]
+    def elb(self, elb):
+        """Lookup an elb by id or name"""
+        lookup = 'id' if re_UUID.match(elb) else 'name'
+
+        elbs = [e for e in self.elbs()['loadbalancers'] if e[lookup] == elb]
         if len(elbs) > 1:
-            warnings.warn("elb name '{}' is not unique!".format(elbname))
+            warnings.warn("elb '{}' is not unique!".format(elb))
         return elbs
 
-    def elb_listeners(self, elbid):
-        """Look up listeners for a given elb id"""
-        endpoints = [ep for e in self._catalog for ep in e['endpoints'] if e['type'] == "network"]
-        if len(endpoints) == 0:
-            raise otc.OtcException("No network endpoint in otc catalog.")
-        ep_elb = endpoints[0]['url'].replace('vpc', 'elb', 1)
-
-        requri = "{}/v1.0/{}/elbaas/listeners?loadbalancer_id={}".format(ep_elb, self._projectid, elbid)
+    def elb_listeners(self, listener=None, elb=None):
+        """Look up listeners"""
+        requri = "{}/v1.0/{}/elbaas/listeners".format(
+            self.elbaas_enpoint, 
+            self._projectid
+        )
+        if elb is not None:
+            elbid = self.elb(elb)[0]['id']
+            requri += "?loadbalancer_id={}".format(elbid)
 
         reqheaders = {
             "Content-Type":    "application/json",
@@ -138,19 +158,17 @@ class OtcClient(object):
 
         try:
             resp = requests.get(requri, headers=reqheaders)
-            elbs = resp.json()
+            listeners = resp.json()
         except Exception, e:
 			raise
 
         if resp.status_code == 200:
-			return elbs
+            if listener is None:
+                return listeners
+            lookup = 'id' if re_UUID.match(listener) else 'name'
+            return [l for l in listeners if l[lookup] == listener]
 
         raise otc.OtcException(resp.headers)
-
-    def elb_listeners_byelbname(self, vpcname, elbname):
-        """Look up listeners for a given vpc name and elb name"""
-        elbs = self.elb_byname(vpcname, elbname)
-        return self.elb_listeners(elbs[0]['id'])
 
     def _get_token(self):
         try:
