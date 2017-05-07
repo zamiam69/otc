@@ -60,7 +60,7 @@ class OtcClient(object):
         return self._keystone_session.get_project_id()
 
     @property
-    def elbaas_enpoint(self):
+    def elbaas_endpoint(self):
         endpoints = [ep for e in self.catalog 
                         for ep in e['endpoints'] 
                         if e['type'] == "network"]
@@ -106,7 +106,7 @@ class OtcClient(object):
     def elbs(self, vpc=None, limit=1024):
         """Look up elbs"""
         requri = "{}/v1.0/{}/elbaas/loadbalancers?limit={}".format(
-            self.elbaas_enpoint,
+            self.elbaas_endpoint,
             self.projectid,
             limit)
         
@@ -148,7 +148,7 @@ class OtcClient(object):
     def elb_listeners(self, listener=None, elb=None):
         """Look up listeners"""
         requri = "{}/v1.0/{}/elbaas/listeners".format(
-            self.elbaas_enpoint, 
+            self.elbaas_endpoint, 
             self.projectid
         )
         if elb is not None:
