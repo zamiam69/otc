@@ -4,3 +4,4 @@
 clouds.yaml
 build
 otc.egg-info
+debian/*
