@@ -17,13 +17,13 @@ def test_otcclient():
     assert len(vpcs) >= 0
 
 def test_elb():
-    """Test otcclient"""
+    """Test elbs"""
     cloud = otc.OtcCloud(cloud='test')
     elbs = cloud.otcclient.elbs()
     assert len(elbs) >= 0
 
 def test_listeners():
-    """Test otcclient"""
+    """Test listeners"""
     cloud = otc.OtcCloud(cloud='test')
     listeners = cloud.otcclient.elb_listeners()
     assert len(listeners) >= 0

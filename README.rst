@@ -27,3 +27,11 @@ How to use it
     # OTC APIs
     cloud.otcclient.vpcs()
     ...
+
+Testing
+-------
+
+Have a cloud 'test' in your *clouds.yaml*. Then run
+
+    nosetest tests
+
