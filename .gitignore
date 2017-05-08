@@ -1,3 +1,7 @@
 *.pyc
 *~
 *.sw[ap]
+clouds.yaml
+build
+otc.egg-info
+debian/*
