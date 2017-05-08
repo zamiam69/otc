@@ -12,6 +12,12 @@ This library intends to make theses APIs accessible on top of shade.
 
 ----
 
+Requirements
+------------
+
+- python-shade
+- Working otc Openstack environment (.ostackrc, openrc, clouds.yaml, ...)
+
 How to use it
 -------------
 
