@@ -15,6 +15,8 @@ This library intends to make theses APIs accessible on top of shade.
 How to use it
 -------------
 
+Example::
+
     import otc
 
     cloud = otc.OtcCloud()
@@ -30,7 +32,7 @@ How to use it
 Testing
 -------
 
-Have a cloud 'test' in your *clouds.yaml*. Then run
+Have a cloud 'test' in your *clouds.yaml*. Then run::
 
     nosetest tests
 
