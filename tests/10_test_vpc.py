@@ -11,6 +11,7 @@ class TestVpcClient:
         pass
 
     def test_vcp_user_agent(self):
+        """Check user agent"""
         assert self.cloud.vpcclient.client.USER_AGENT == 'python-otcclient'
 
     def test_vpcclient_vpc(self):
