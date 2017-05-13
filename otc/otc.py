@@ -10,16 +10,14 @@ class HTTPClient(novaclient.client.HTTPClient):
 
     def __init__(self, *args, **kwargs):
         service_catalog = kwargs.pop('service_catalog')
+        service_url = kwargs.pop('service_url')
 
         super(HTTPClient, self).__init__(*args, **kwargs)
         self.service_catalog = service_catalog
+        self.service_url = service_url
 
     def get_service_url(self, service_type):
-        ep_urls = [e['url'] 
-            for x in self.service_catalog 
-            for e in x['endpoints'] if x['type'] == service_type
-        ]
-        return ep_urls[0]
+        return self.service_url
 
     def _cs_request(self, url, method, **kwargs):
         return super(HTTPClient, self)._cs_request(url, method, **kwargs)
@@ -36,7 +34,9 @@ class OtcCloud(OpenStackCloud):
 
     def __init__(self, *args, **kwargs):
         super(OtcCloud, self).__init__(*args, **kwargs)
-        self._otc_client = None
+        # self._otc_client = None
+        self._vpcclient = None
+        self._elbclient = None
 
     @property
     def auth_token(self):
@@ -55,15 +55,39 @@ class OtcCloud(OpenStackCloud):
         return self.cloud_config.config['auth']['auth_url'] + '/auth/tokens'
 
     @property
-    def otc_client(self):
-        if self._otc_client is None:
-            self._otc_client = otcclient.OtcClient(
+    def vpcclient(self):
+        if self._vpcclient is None:
+            self._vpcclient = otcclient.VpcClient(
                 cloud_config=self.cloud_config,
                 catalog=self.service_catalog,
                 project_id=self.project_id,
                 auth_token=self.auth_token,
                 management_url=self.management_url,
             )
-        return self._otc_client
+        return self._vpcclient
+
+    @property
+    def elbclient(self):
+        if self._elbclient is None:
+            self._elbclient = otcclient.ElbClient(
+                cloud_config=self.cloud_config,
+                catalog=self.service_catalog,
+                project_id=self.project_id,
+                auth_token=self.auth_token,
+                management_url=self.management_url,
+            )
+        return self._elbclient
+
+    # @property
+    # def otc_client(self):
+    #     if self._otc_client is None:
+    #         self._otc_client = otcclient.OtcClient(
+    #             cloud_config=self.cloud_config,
+    #             catalog=self.service_catalog,
+    #             project_id=self.project_id,
+    #             auth_token=self.auth_token,
+    #             management_url=self.management_url,
+    #         )
+    #     return self._otc_client
 
 # vim: sts=4 sw=4 ts=4 et:

@@ -1,22 +1,22 @@
+import shade
 import otc
 
-def test_shade_works():
-    """Test shade works"""
-    cloud = otc.OtcCloud(cloud='test')
+class TestBasics:
+    """Basic tests"""
 
-def test_otc():
-    """Basic Test"""
-    cloud = otc.OtcCloud(cloud='test')
-    images = cloud.list_images()
-    assert len(images) >= 0
+    def setUp(self):
+        self.cloud = otc.OtcCloud(cloud='test')
 
-def test_otcclient_client():
-    cloud = otc.OtcCloud(cloud='test')
-    assert cloud.otc_client.client.USER_AGENT == 'python-otcclient'
-    
-def test_otcclient_vpc_list():
-    cloud = otc.OtcCloud(cloud='test')
-    vpcs = cloud.otc_client.vpc.list()
-    assert len(vpcs) >= 0
+    def tearDown(self):
+        pass
+
+    def test_construction(self):
+        """Test it can be set up"""
+        assert isinstance(self.cloud, shade.OpenStackCloud)
+
+    def test_shade_works(self):
+        """Ensure shade methods are available"""
+        images = self.cloud.list_images()
+        assert len(images) >= 0
 
 # vim: sts=4 sw=4 ts=4 et:
