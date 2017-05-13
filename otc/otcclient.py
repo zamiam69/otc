@@ -1,6 +1,7 @@
 import otc
 import vpc.vpc as vpc
 import elbaas.elb as elb
+import elbaas.listener as listener
 
 import re
 
@@ -47,6 +48,7 @@ class ElbClient(OtcClient):
     def __init__(self, *args, **kwargs):
         super(ElbClient, self).__init__(*args, **kwargs)
         self.elb = elb.ElbManager(self)
+        self.listener = listener.ListenerManager(self)
 
     @property
     def service_url(self):
