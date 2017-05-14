@@ -1,2 +1,2 @@
 from shade import *
-from otc import *
+from otc.otccloud import OtcCloud

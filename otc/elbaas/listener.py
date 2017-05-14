@@ -1,9 +1,10 @@
-from novaclient import base
+import otc.base
+from novaclient import base as ncbase
 
-class Listener(base.Resource):
+class Listener(otc.base.Resource):
     pass
 
-class ListenerManager(base.Manager):
+class ListenerManager(otc.base.ResourceManager):
     resource_class = Listener
 
     def list(self, elbid=None):
@@ -14,6 +15,6 @@ class ListenerManager(base.Manager):
             url += "?loadbalancer_id={}".format(elbid)
         resp, data = self.api.client.get(url)
         items = [Listener(self, x, loaded=True) for x in data if x]
-        return base.ListWithMeta(items, resp)
+        return ncbase.ListWithMeta(items, resp)
 
 # vim: sts=4 sw=4 ts=4 et:

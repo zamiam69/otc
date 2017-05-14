@@ -1,9 +1,9 @@
-from novaclient import base
+import otc.base
 
-class Elb(base.Resource):
+class Elb(otc.base.Resource):
     pass
 
-class ElbManager(base.Manager):
+class ElbManager(otc.base.ResourceManager):
     resource_class = Elb
 
     def list(self, vpcid=None, limit=1024):

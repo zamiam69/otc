@@ -1,9 +1,9 @@
-from novaclient import base
+import otc.base
 
-class Vpc(base.Resource):
+class Vpc(otc.base.Resource):
     pass
 
-class VpcManager(base.Manager):
+class VpcManager(otc.base.ResourceManager):
     resource_class = Vpc
 
     def list(self, limit=1024):

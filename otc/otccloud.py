@@ -1,36 +1,10 @@
 from shade import openstackcloud
 from shade import _utils
 
-import requests
-import json
 import otcclient
 
-import novaclient.client
-
-class HTTPClient(novaclient.client.HTTPClient):
-    USER_AGENT = 'python-otcclient'
-
-    def __init__(self, *args, **kwargs):
-        service_catalog = kwargs.pop('service_catalog')
-        service_url = kwargs.pop('service_url')
-
-        super(HTTPClient, self).__init__(*args, **kwargs)
-        self.service_catalog = service_catalog
-        self.service_url = service_url
-
-    def get_service_url(self, service_type):
-        return self.service_url
-
-    def _cs_request(self, url, method, **kwargs):
-        return super(HTTPClient, self)._cs_request(url, method, **kwargs)
-
-def _construct_http_client(*args, **kwargs):
-    return HTTPClient(*args, **kwargs)
-
-class OtcException(Exception):
-    pass
-
 class OtcCloud(openstackcloud.OpenStackCloud):
+
     """Wraps shade. Where shade can do an OTC job shade will be used.
     OTC proprietary stuff will be dealt with in this module."""
 

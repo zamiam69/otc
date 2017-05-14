@@ -1,4 +1,5 @@
 import otc
+
 import vpc.vpc as vpc
 import elbaas.elb as elb
 import elbaas.listener as listener
@@ -16,7 +17,7 @@ class OtcClient(object):
         self.catalog = catalog
         self.cloud_config = cloud_config
 
-        self.client = otc._construct_http_client(
+        self.client = otc.base._construct_http_client(
             self.cloud_config.config['auth']['username'],
             self.cloud_config.config['auth']['password'],
             self.projectid,
@@ -34,7 +35,7 @@ class OtcClient(object):
                         for ep in e['endpoints'] 
                         if e['type'] == "network"]
         if len(endpoints) == 0:
-            raise otc.OtcException("No network endpoint in otc catalog.")
+            raise otc.exceptions.OtcException("No network endpoint in otc catalog.")
 
         return endpoints[0]['url']
 
