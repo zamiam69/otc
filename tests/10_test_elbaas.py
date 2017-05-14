@@ -14,6 +14,10 @@ class TestElbClient:
         """Check user agent"""
         assert self.cloud.elbclient.client.USER_AGENT == 'python-otcclient'
 
+    def test_elbclient_service_url(self):
+        """Check ELB service url"""
+        assert self.cloud.elbclient.service_url == "https://elb.eu-de.otc.t-systems.com"
+
     def test_elbclient_elb(self):
         """List elbs"""
         elbs = self.cloud.elbclient.elb.list()
