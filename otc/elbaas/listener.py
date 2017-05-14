@@ -11,7 +11,7 @@ class ListenerManager(base.Manager):
             self.api.projectid,
         )
         if elbid is not None:
-            url += "&loadbalancer_id={}".format(elbid)
+            url += "?loadbalancer_id={}".format(elbid)
         resp, data = self.api.client.get(url)
         items = [Listener(self, x, loaded=True) for x in data if x]
         return base.ListWithMeta(items, resp)

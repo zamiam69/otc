@@ -1,4 +1,6 @@
-from shade import *
+from shade import openstackcloud
+from shade import _utils
+
 import requests
 import json
 import otcclient
@@ -28,7 +30,7 @@ def _construct_http_client(*args, **kwargs):
 class OtcException(Exception):
     pass
 
-class OtcCloud(OpenStackCloud):
+class OtcCloud(openstackcloud.OpenStackCloud):
     """Wraps shade. Where shade can do an OTC job shade will be used.
     OTC proprietary stuff will be dealt with in this module."""
 
@@ -78,16 +80,32 @@ class OtcCloud(OpenStackCloud):
             )
         return self._elbclient
 
-    # @property
-    # def otc_client(self):
-    #     if self._otc_client is None:
-    #         self._otc_client = otcclient.OtcClient(
-    #             cloud_config=self.cloud_config,
-    #             catalog=self.service_catalog,
-    #             project_id=self.project_id,
-    #             auth_token=self.auth_token,
-    #             management_url=self.management_url,
-    #         )
-    #     return self._otc_client
+    @staticmethod
+    def by_name_or_id(resources, name_or_id):
+        return [
+            x for x in resources
+            if x.id == name_or_id or x.name == name_or_id
+        ]
+
+    @_utils.cache_on_arguments()
+    def list_vpcs(self):
+        return self.vpcclient.vpc.list()
+
+    def search_vpcs(self, name_or_id):
+        return self.by_name_or_id(self.list_vpcs(), name_or_id)
+
+    @_utils.cache_on_arguments()
+    def list_elbs(self):
+        return self.elbclient.elb.list()
+
+    def search_elbs(self, name_or_id):
+        return self.by_name_or_id(self.list_elbs(), name_or_id)
+
+    @_utils.cache_on_arguments()
+    def list_listeners(self):
+        return self.elbclient.listener.list()
+
+    def search_listeners(self, name_or_id):
+        return self.by_name_or_id(self.list_listeners(), name_or_id)
 
 # vim: sts=4 sw=4 ts=4 et:

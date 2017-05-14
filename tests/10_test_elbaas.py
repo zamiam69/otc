@@ -18,10 +18,18 @@ class TestElbClient:
         """List elbs"""
         elbs = self.cloud.elbclient.elb.list()
         assert len(elbs) >= 0
+        elbs = self.cloud.elbclient.elb.list(vpcid='foo')
+        assert len(elbs) >= 0
+        elbs = self.cloud.elbclient.elb.list('foo')
+        assert len(elbs) >= 0
 
     def test_elbclient_listener(self):
         """List listeners"""
         lstns = self.cloud.elbclient.listener.list()
+        assert len(lstns) >= 0
+        lstns = self.cloud.elbclient.listener.list('foo')
+        assert len(lstns) >= 0
+        lstns = self.cloud.elbclient.listener.list(elbid='foo')
         assert len(lstns) >= 0
 
 # vim: sts=4 sw=4 ts=4 et:

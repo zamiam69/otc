@@ -10,9 +10,13 @@ class TestVpcClient:
     def tearDown(self):
         pass
 
-    def test_vcp_user_agent(self):
+    def test_vpc_user_agent(self):
         """Check user agent"""
         assert self.cloud.vpcclient.client.USER_AGENT == 'python-otcclient'
+
+    def test_vpc_service_url(self):
+        """Check service url"""
+        assert self.cloud.vpcclient.service_url != ""
 
     def test_vpcclient_vpc(self):
         """List vpcs"""
