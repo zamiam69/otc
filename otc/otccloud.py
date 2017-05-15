@@ -13,6 +13,7 @@ class OtcCloud(openstackcloud.OpenStackCloud):
         # self._otc_client = None
         self._vpcclient = None
         self._elbclient = None
+        self._ecsclient = None
 
     @property
     def auth_token(self):
@@ -53,6 +54,18 @@ class OtcCloud(openstackcloud.OpenStackCloud):
                 management_url=self.management_url,
             )
         return self._elbclient
+
+    @property
+    def ecsclient(self):
+        if self._ecsclient is None:
+            self._ecsclient = otcclient.EcsClient(
+                cloud_config=self.cloud_config,
+                catalog=self.service_catalog,
+                project_id=self.project_id,
+                auth_token=self.auth_token,
+                management_url=self.management_url,
+            )
+        return self._ecsclient
 
     @staticmethod
     def by_name_or_id(resources, name_or_id):

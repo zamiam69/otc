@@ -1,5 +1,6 @@
 import otc
 
+import ecs.ecs as ecs
 import vpc.vpc as vpc
 import elbaas.elb as elb
 import elbaas.listener as listener
@@ -45,6 +46,15 @@ class VpcClient(OtcClient):
         super(VpcClient, self).__init__(*args, **kwargs)
         self.vpc = vpc.VpcManager(self)
 
+class EcsClient(OtcClient):
+    def __init__(self, *args, **kwargs):
+        super(EcsClient, self).__init__(*args, **kwargs)
+        self.ecs = ecs.EcsManager(self)
+
+    @property
+    def service_url(self):
+        return super(EcsClient, self).service_url.replace('vpc', 'ecs', 1)
+ 
 class ElbClient(OtcClient):
     def __init__(self, *args, **kwargs):
         super(ElbClient, self).__init__(*args, **kwargs)

@@ -1,4 +1,4 @@
-tests:
+tests: clean
 	nosetests --cover-package otc tests
 
 clean:
