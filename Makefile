@@ -1,5 +1,5 @@
 tests: clean
-	nosetests --cover-package otc tests
+	nosetests --with-coverage --cover-package otc tests
 
 clean:
 	find -name \*.pyc -print0 | xargs -0 rm

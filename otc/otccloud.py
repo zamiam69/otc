@@ -75,6 +75,13 @@ class OtcCloud(openstackcloud.OpenStackCloud):
         ]
 
     @_utils.cache_on_arguments()
+    def list_ecs(self):
+        return self.ecsclient.ecs.list()
+
+    def search_ecs(self, name_or_id):
+        return self.by_name_or_id(self.list_ecs(), name_or_id)
+
+    @_utils.cache_on_arguments()
     def list_vpcs(self):
         return self.vpcclient.vpc.list()
 

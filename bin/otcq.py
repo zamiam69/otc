@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf8
 
+import sys
 import argparse
 import otc
 
@@ -43,6 +44,16 @@ def vpc_do(cloud, args):
     else:
         print "Operation not implemented: {}".format(args.OPERATION)
 
+def ecs_do(cloud, args):
+    if args.OPERATION == 'list':
+        if args.ECS:
+            res = cloud.search_ecs(args.ECS)
+        else:
+            res = cloud.list_ecs()
+        print cmdout(args, res)
+    else:
+        print "Operation not implemented: {}".format(args.OPERATION)
+
 def listener_do(cloud, args):
     if args.OPERATION == 'list':
         if args.LISTENER:
@@ -68,17 +79,21 @@ output.add_argument('--yaml', action='store_true')
 sp = ap.add_subparsers(help="OTC APIs")
 
 ap_vpc = sp.add_parser('vpc', help='Virtual Private Cloud')
+ap_ecs = sp.add_parser('ecs', help="Elastic Cloud Server")
 ap_elb = sp.add_parser('elb', help="Elastic Load Balancer")
 ap_listener = sp.add_parser('listener', help="Elastic Load Balancer Listener")
 
 ap_vpc.add_argument('OPERATION', **crud_operations)
 ap_vpc.add_argument('VPC', nargs='?', help="OTC vpc name or id")
+ap_ecs.add_argument('OPERATION', **crud_operations)
+ap_ecs.add_argument('ECS', nargs='?', help="OTC ecs name or id")
 ap_elb.add_argument('OPERATION', **crud_operations)
 ap_elb.add_argument('ELB', nargs='?', help="OTC elb name or id")
 ap_listener.add_argument('OPERATION', **crud_operations)
 ap_listener.add_argument('LISTENER', nargs='?', help="OTC elb listener name or id")
 
 ap_vpc.set_defaults(apicmd=vpc_do)
+ap_ecs.set_defaults(apicmd=ecs_do)
 ap_elb.set_defaults(apicmd=elb_do)
 ap_listener.set_defaults(apicmd=listener_do)
 

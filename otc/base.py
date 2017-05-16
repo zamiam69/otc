@@ -1,8 +1,9 @@
+import munch
+
 from novaclient import base, client
 
 class Resource(base.Resource):
     """Base for OTC Resources"""
-    pass
 
 class ResourceManager(base.Manager):
     """Base for OTC Resource Managers"""
